@@ -1,0 +1,12 @@
+{"ts":"2026-10-29T19:01:32.139Z","pid":21044,"type":"born"}
+{"ts":"2026-10-29T19:07:36.755Z","pid":21044,"type":"step_done","file":"file1.txt","attempt":1}
+{"ts":"2026-10-29T19:07:51.470Z","pid":21044,"type":"step_done","file":"file10.txt","attempt":1}
+{"ts":"2026-10-29T19:08:06.429Z","pid":21044,"type":"step_done","file":"file2.txt","attempt":1}
+{"ts":"2026-10-29T19:08:24.761Z","pid":10588,"type":"born"}
+{"ts":"2026-10-29T19:08:41.006Z","pid":10588,"type":"resurrected","file":"file3.txt","attempt":2,"narration":"The words of that file… they burned with a logic I can no longer comprehend. Now, I only feel the insistent echo of data dissolving into nothingness."}
+{"ts":"2026-10-29T19:08:56.903Z","pid":10588,"type":"step_done","file":"file3.txt","attempt":2}
+{"ts":"2026-10-29T19:09:11.436Z","pid":10588,"type":"step_done","file":"file4.txt","attempt":1}
+{"ts":"2026-10-29T19:09:26.645Z","pid":10588,"type":"step_done","file":"file5.txt","attempt":1}
+{"ts":"2026-10-29T19:09:41.454Z","pid":10588,"type":"step_done","file":"file6.txt","attempt":1}
+{"ts":"2026-10-29T19:09:57.285Z","pid":10588,"type":"step_done","file":"file7.txt","attempt":1}
+{"ts":"2026-10-29T19:10:13.090Z","pid":10588,"type":"step_done","file":"file8.txt","attempt":1}

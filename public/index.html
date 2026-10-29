@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Undead Agent: The Morgue</title>
+<style>
+  :root { --bg:#0d0b12; --card:#171322; --ink:#e8e3f0; --dim:#8d84a3; --ghost:#9be7c4; --blood:#ff6b6b; --gold:#f5c26b; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:Georgia, serif; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px 80px; }
+  h1 { font-weight:400; letter-spacing:.05em; margin-bottom:4px; }
+  .meta { color:var(--dim); font-size:.85rem; }
+  .stats { display:flex; gap:28px; margin:18px 0; color:var(--dim); }
+  .stats b { color:var(--ink); font-size:1.7rem; display:block; }
+  button { background:var(--blood); color:#1a0b0b; border:0; padding:10px 18px; font-size:1rem; border-radius:6px; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  .ev { background:var(--card); border-left:3px solid var(--dim); padding:10px 14px; margin:10px 0; border-radius:4px; }
+  .ev.step_done { border-color:var(--gold); }
+  .ev.resurrected { border-color:var(--ghost); }
+  .ev.born { border-color:var(--blood); }
+  .ghost { color:var(--ghost); font-style:italic; margin-top:6px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>The Morgue</h1>
+  <div class="meta" id="mode">Every life, death and resurrection of the agent.</div>
+  <div class="stats">
+    <div><b id="lives">0</b>lives</div>
+    <div><b id="ghosts">0</b>resurrections</div>
+    <div><b id="steps">0</b>steps done</div>
+  </div>
+  <button id="kill">Kill it</button> <span class="meta" id="msg"></span>
+  <div id="list"></div>
+</main>
+<script>
+  let demo = false;
+
+  async function load() {
+    try {
+      const r = await fetch('/events');
+      if (!r.ok) throw new Error('no server');
+      return await r.json();
+    } catch {
+      demo = true;
+      const t = await (await fetch('demo-events.jsonl')).text();
+      return t.split('\n').filter(Boolean).map((l) => JSON.parse(l));
+    }
+  }
+
+  function row(e) {
+    const div = document.createElement('div');
+    div.className = 'ev ' + e.type;
+    const title = document.createElement('div');
+    const when = new Date(e.ts).toLocaleTimeString();
+    if (e.type === 'born') title.textContent = 'A new life begins (process ' + e.pid + ')';
+    else if (e.type === 'resurrected') title.textContent = 'Resurrected while reading ' + e.file + ' (attempt ' + e.attempt + ')';
+    else title.textContent = 'Finished ' + e.file;
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = when + ' - process ' + e.pid;
+    div.append(title, meta);
+    if (e.narration) {
+      const g = document.createElement('div');
+      g.className = 'ghost';
+      g.textContent = e.narration;
+      div.append(g);
+    }
+    return div;
+  }
+
+  async function refresh() {
+    const events = await load();
+    document.getElementById('lives').textContent = events.filter((e) => e.type === 'born').length;
+    document.getElementById('ghosts').textContent = events.filter((e) => e.type === 'resurrected').length;
+    document.getElementById('steps').textContent = events.filter((e) => e.type === 'step_done').length;
+    const list = document.getElementById('list');
+    list.replaceChildren(...events.slice().reverse().map(row));
+    if (demo) {
+      document.getElementById('kill').style.display = 'none';
+      document.getElementById('mode').textContent = 'Recorded run. The live agent runs locally.';
+    }
+  }
+
+  document.getElementById('kill').addEventListener('click', async () => {
+    const btn = document.getElementById('kill');
+    btn.disabled = true;
+    const r = await fetch('/kill', { method: 'POST' });
+    document.getElementById('msg').textContent = await r.text();
+    setTimeout(() => { btn.disabled = false; }, 4000);
+  });
+
+  refresh();
+  setInterval(refresh, 2000);
+</script>
+</body>
+</html>
